@@ -1,0 +1,35 @@
+kind: pipeline
+name: fw_docker
+
+steps:
+  - name: compile
+    image: registry.cn-beijing.aliyuncs.com/king019/docker:build
+    privileged: true
+    volumes:
+      - name: maven
+        path: /root/.m2
+    commands:
+      - cd fw_docker
+      - mvn compile -DskipTests=true
+  - name: sonar
+    image: registry.cn-beijing.aliyuncs.com/king019/docker:build
+    privileged: true
+    volumes:
+      - name: maven
+        path: /root/.m2
+    environment:
+      SONAR_KEY:
+        from_secret: sonar_key
+      SONAR_URL:
+        from_secret: sonar_url
+      SONAR_TOKEN:
+        from_secret: sonar_token
+    commands:
+      - java -version
+      - mvn -version
+      - mvn sonar:sonar -Dsonar.java.binaries=target/ -Djava-module.sonar.projectBaseDir=. -Dsonar.projectKey=sonar  -Dsonar.host.url=http://192.168.5.124:9100  -Dsonar.login=5684865daeb30a34eb24df6179be6f0d0792e27e
+
+volumes:
+  - name: maven
+    host:
+      path: /opt/soft/docker/data/maven/m2

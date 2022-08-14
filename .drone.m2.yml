@@ -1,0 +1,10 @@
+kind: pipeline
+name: fw_docker
+
+steps:
+  - name: compile
+    image: registry.cn-beijing.aliyuncs.com/king019/docker:build
+    privileged: true
+    commands:
+      - cd fw_docker
+      - mvn compile -DskipTests=true
